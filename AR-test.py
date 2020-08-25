@@ -1,136 +1,152 @@
-from objc_util import *
+import re
+import math
+from objc_util import load_framework, ObjCClass, ObjCInstance, create_objc_class, on_main_thread, CGRect
 import ui
+import editor
+
 from pprint import pprint
 
-
-def pPass():
-  print('Pass')
-def pdbg(obj):
-  print('# --- name______')
-  try:
-    pprint(obj)
-  except:
-    pPass()
-  print('# --- vars( )______')
-  try:
-    pprint(vars(obj))
-  except:
-    pPass()
-  print('# --- dir( )______')
-  try:
-    pprint(dir(obj))
-  except:
-    pPass()
-  
-  # todo: 落ちる時は落ちる
-  print('# --- ivarDescription')
-  try:
-    #pass
-    pprint(obj._ivarDescription())
-  except:
-    pPass()
-  print('# --- shortMethodDescription')
-  try:
-    pprint(obj._shortMethodDescription())
-  except:
-    pPass()
-  print('# --- methodDescription')
-  try:
-    pprint(obj._methodDescription())
-  except:
-    pPass()
-  
-  print('# --- recursiveDescription')
-  try:
-    pprint(obj.recursiveDescription())
-  except:
-    pPass()
-  print('# --- autolayoutTrace')
-  try:
-    pprint(obj._autolayoutTrace())
-  except:
-    pPass()
-
-
-
-load_framework('SceneKit')
 load_framework('ARKit')
+load_framework('SceneKit')
 
-SCNScene=ObjCClass('SCNScene')
-SCNView=ObjCClass('SCNView')
-SCNNode=ObjCClass('SCNNode')
-SCNCamera=ObjCClass('SCNCamera')
-SCNMaterial=ObjCClass('SCNMaterial')
-SCNBox=ObjCClass('SCNBox')
-UIColor=ObjCClass('UIColor')
-SCNLight=ObjCClass('SCNLight')
+NSObject = ObjCClass('NSObject')
+UIColor = ObjCClass('UIColor')
 
+ARSCNView = ObjCClass('ARSCNView')
+ARWorldTrackingConfiguration = ObjCClass('ARWorldTrackingConfiguration')
 
-ARWorldTrackingConfiguration=ObjCClass('ARWorldTrackingConfiguration')
-ARSCNView=ObjCClass('ARSCNView')
-ARSession=ObjCClass('ARSession')
+SCNScene = ObjCClass('SCNScene')
+SCNNode = ObjCClass('SCNNode')
+SCNBox = ObjCClass('SCNBox')
 
 
+def anchor_attribute(anchor):
+  id_pattern = r'\"(.*?)\"'
+  _identifier = re.search(id_pattern, anchor).group(1)
+  prm_pattern = r'(center|extent)\=\((.*?)\)'
+  greps = re.findall(prm_pattern, anchor)
+  _center = [float(i) for i in re.split(r'\s', greps[0][1])]
+  _extent = [float(j) for j in re.split(r'\s', greps[1][1])]
+  return _center, _extent, _identifier
 
 
-class MainView(ui.View):
-  def __init__(self,*args,**kwargs):
-    self.bg_color='red'
-    f = CGRect(CGPoint(0, 0), CGSize(self.width, self.height))
-    flex_width, flex_height = (1<<1), (1<<4)
-    
-    selfIns=ObjCInstance(self)
-    
-    
-    # --- view
-    # todo: options ？🤔
-    # todo: autorelease() とりま呼び出し
-    s_view=ARSCNView.alloc().initWithFrame_options_(f, None).autorelease()
-    s_view.setAutoresizingMask_(flex_width|flex_height)
-    #s_view.delegate=selfIns
-    s_scene=SCNScene.scene()
-    s_view.scene=s_scene
-    s_view.showsStatistics=1
-    
-    
-    box_obj=SCNBox.boxWithWidth_height_length_chamferRadius_(0.1,0.1,0.1,0.05)
-    box_obj.material().setColor_(UIColor.cyanColor().CGColor())
-    bNode=SCNNode.nodeWithGeometry_(box_obj)
-    bNode.setPosition_((0, 0, -0.2))
-    s_scene.rootNode().addChildNode_(bNode)
-    
-    # --- 光
-    lght=SCNLight.light()
-    lght.setType_('omni')
-    #lght.type='omni' これもいける
-    lght.setColor_(UIColor.blueColor().CGColor())
-    lNode=SCNNode.node()
-    lNode.setLight_(lght)
-    lNode.setPosition_((-40.0,40.0,60.0))
-    s_scene.rootNode().addChildNode_(lNode)
-    
-    amb_obj=SCNLight.light()
-    amb_obj.setType_('ambient')
-    amb_obj.setColor_(UIColor.purpleColor().CGColor())
-    aNode=SCNNode.node()
-    aNode.setLight_(amb_obj)
-    s_scene.rootNode().addChildNode_(aNode)
-    
-    
-    
-    ar_cnfg = ARWorldTrackingConfiguration.new()
-    ar_session=ARSession.new()
-    ar_session.delegate=selfIns
-    ar_session.runWithConfiguration_(ar_cnfg)
-    s_view.setSession_(ar_session)
-    
-    
-    
-    
-    
-    selfIns.addSubview_(s_view)
+def renderer_didAddNode_forAnchor_(_self, _cmd, renderer, node, anchor):
+  get_anchor = repr(str(ObjCInstance(anchor)))
+  center, extent, identifier = anchor_attribute(get_anchor)
+  print(center)
+  print(extent)
+  print(identifier)
+  after_color = UIColor.colorWithRed_green_blue_alpha_(0.0, 0.2, 0.8, 1.0)
+  view.vc.box_geometry.firstMaterial().diffuse().contents = after_color
 
-v=MainView()
-v.present()
 
+def renderer_didUpdateNode_forAnchor_(_self, _cmd, renderer, node, anchor):
+  pass
+
+
+def renderer_didRemoveNode_forAnchor_(_self, _cmd, renderer, node, anchor):
+  pass
+
+
+class ViewController:
+  ''' debugOptions
+  OptionNone = 0
+  ShowBoundingBoxes = (1 << 1)
+  ShowWireframe = (1 << 5)
+  RenderAsWireframe = (1 << 6)
+  ShowSkeletons = (1 << 7)
+  ShowCreases = (1 << 8)
+  ShowConstraints = (1 << 9)
+  ShowCameras = (1 << 10)
+  ShowLightInfluences = (1 << 2)
+  ShowLightExtents = (1 << 3)
+  ShowPhysicsShapes = (1 << 0)
+  ShowPhysicsFields = (1 << 4)
+  ARSCNDebugOptionShowWorldOrigin = (1 << 30)?
+  ARSCNDebugOptionShowFeaturePoints = (1 << 32)?
+  '''
+
+  def __init__(self):
+    # create delegate
+    methods = [
+      renderer_didAddNode_forAnchor_, renderer_didUpdateNode_forAnchor_,
+      renderer_didRemoveNode_forAnchor_
+    ]
+    protocols = ['ARSCNViewDelegate']
+    pyARSCNViewDelegate = create_objc_class(
+      'pyARSCNViewDelegate', NSObject, methods=methods, protocols=protocols)
+    self.view_did_load()
+    self.view_will_appear(pyARSCNViewDelegate)
+
+  def view_did_load(self):
+    self.scene = SCNScene.scene()
+    before_color = UIColor.colorWithRed_green_blue_alpha_(0.8, 0.0, 0.0, 0.5)
+    self.box_geometry = SCNBox.box()
+    self.box_geometry.width = 0.1
+    self.box_geometry.height = 0.1
+    self.box_geometry.length = 0.1
+    self.box_geometry.material(
+    ).lightingModelName = 'SCNLightingModelPhysicallyBased'
+    self.box_geometry.firstMaterial().diffuse().contents = before_color
+    box_node = SCNNode.nodeWithGeometry_(self.box_geometry)
+    box_node.position = (0, -0.5, -0.5)
+    box_node.eulerAngles = (1, 1, 0)
+    self.scene.rootNode().addChildNode_(box_node)
+
+    self.scn_view = ARSCNView.alloc()
+    self.scn_view.initWithFrame_options_(CGRect((0, 0), (100, 100)), None)
+    self.scn_view.autorelease()
+    self.scn_view.autoresizingMask = (18)
+    self.scn_view.showsStatistics = True
+    self.scn_view.autoenablesDefaultLighting = True
+    self.scn_view.debugOptions = (1 << 1) | (1 << 30)
+    self.scn_view.scene = self.scene
+
+  def view_will_appear(self, delegate):
+    configuration = ARWorldTrackingConfiguration.new()
+    configuration.planeDetection = (1 << 0)
+    self.scn_view.session().runWithConfiguration_(configuration)
+    self.scn_view.delegate = delegate.alloc().init()
+
+  def view_will_disappear(self):
+    self.scn_view.session().pause()
+
+
+class View(ui.View):
+  def __init__(self):
+    self.instance = ObjCInstance(self)
+    self.setup_objc()
+    self.setup_ui()
+
+  @on_main_thread
+  def setup_objc(self):
+    self.vc = ViewController()
+    self.instance.addSubview_(self.vc.scn_view)
+
+  def setup_ui(self):
+    self.close_btn = self.create_btn('iob:ios7_close_32')
+    self.close_btn.action = (lambda sender: self.close())
+    self.add_subview(self.close_btn)
+
+  def create_btn(self, icon):
+    btn_icon = ui.Image.named(icon)
+    return ui.Button(image=btn_icon)
+
+  def layout(self):
+    _x, _y, _w, _h = self.frame
+    _bx, _by, btn_w, btn_h = self.close_btn.frame
+    self.close_btn.x = (_w * .92) - (btn_w / 2)
+    self.close_btn.y = (_h * .08) - (btn_h / 2)
+
+  def will_close(self):
+    self.vc.view_will_disappear()
+
+
+view = View()
+editor.present_themed(
+  view,
+  theme_name='Theme09_Editorial',
+  style='fullscreen',
+  hide_title_bar=True,
+  orientations=['portrait'])
 
