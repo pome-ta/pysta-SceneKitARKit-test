@@ -95,17 +95,17 @@ class View(ui.View):
     scn_view.showsStatistics = True
     '''
     OptionNone = 0
+    ShowPhysicsShapes = (1 << 0)
     ShowBoundingBoxes = (1 << 1)
+    ShowLightInfluences = (1 << 2)
+    ShowLightExtents = (1 << 3)
+    ShowPhysicsFields = (1 << 4)
     ShowWireframe = (1 << 5)
     RenderAsWireframe = (1 << 6)
     ShowSkeletons = (1 << 7)
     ShowCreases = (1 << 8)
     ShowConstraints = (1 << 9)
     ShowCameras = (1 << 10)
-    ShowLightInfluences = (1 << 2)
-    ShowLightExtents = (1 << 3)
-    ShowPhysicsShapes = (1 << 0)
-    ShowPhysicsFields = (1 << 4)
     '''
     scn_view.debugOptions = (1 << 1) | (1 << 3) | (1 << 5) | (1 << 10)
     scn_view.scene = scene
