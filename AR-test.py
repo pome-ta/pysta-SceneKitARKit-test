@@ -69,8 +69,8 @@ class ViewController:
   def __init__(self):
     # create delegate
     methods = [
-      renderer_didAddNode_forAnchor_, renderer_didUpdateNode_forAnchor_,
-      renderer_didRemoveNode_forAnchor_
+      renderer_didAddNode_forAnchor_, #renderer_didUpdateNode_forAnchor_,
+      #renderer_didRemoveNode_forAnchor_
     ]
     protocols = ['ARSCNViewDelegate']
     pyARSCNViewDelegate = create_objc_class(
@@ -99,7 +99,7 @@ class ViewController:
     self.scn_view.autoresizingMask = (18)
     self.scn_view.showsStatistics = True
     self.scn_view.autoenablesDefaultLighting = True
-    self.scn_view.debugOptions = (1 << 1) | (1 << 30)
+    self.scn_view.debugOptions = (1 << 1) | (1 << 30) | (1 << 32)
     self.scn_view.scene = self.scene
 
   def view_will_appear(self, delegate):
