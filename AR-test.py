@@ -9,7 +9,6 @@ from pprint import pprint
 load_framework('ARKit')
 load_framework('SceneKit')
 
-NSObject = ObjCClass('NSObject')
 UIColor = ObjCClass('UIColor')
 
 ARSCNView = ObjCClass('ARSCNView')
@@ -33,9 +32,9 @@ def anchor_attribute(anchor):
 def renderer_didAddNode_forAnchor_(_self, _cmd, renderer, node, anchor):
   get_anchor = repr(str(ObjCInstance(anchor)))
   center, extent, identifier = anchor_attribute(get_anchor)
-  print(center)
-  print(extent)
-  print(identifier)
+  #print(center)
+  #print(extent)
+  #print(identifier)
   after_color = UIColor.colorWithRed_green_blue_alpha_(0.0, 0.2, 0.8, 1.0)
   view.vc.box_geometry.firstMaterial().diffuse().contents = after_color
 
@@ -74,7 +73,7 @@ class ViewController:
     ]
     protocols = ['ARSCNViewDelegate']
     pyARSCNViewDelegate = create_objc_class(
-      'pyARSCNViewDelegate', NSObject, methods=methods, protocols=protocols)
+      'pyARSCNViewDelegate', methods=methods, protocols=protocols)
     self.view_did_load()
     self.view_will_appear(pyARSCNViewDelegate)
 
