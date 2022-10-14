@@ -1,0 +1,3 @@
+[submodule "pystaFace-TrackingARtest"]
+	path = pystaFace-TrackingARtest
+	url = https://github.com/pome-ta/pystaFace-TrackingARtest
