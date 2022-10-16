@@ -11,5 +11,20 @@
 
 [Xamarin.iOS での ARKit の概要 - Xamarin | Microsoft Learn](https://learn.microsoft.com/ja-jp/xamarin/ios/platform/introduction-to-ios11/arkit/)
 
+## RealityKit
+
+多分`ARView` 呼び出せない？SceneKit でいいからええけど
+
+ん、framework は存在するか？
 
 
+```
+--- Frameworks :hit 2
+/System/Library/Frameworks/RealityFoundation.framework
+/System/Library/Frameworks/RealityKit.framework
+--- PrivateFrameworks :hit 3
+/System/Library/PrivateFrameworks/CoreRealityIO.framework
+/System/Library/PrivateFrameworks/RealityFusion.framework
+/System/Library/PrivateFrameworks/RealityIO.framework
+
+```
