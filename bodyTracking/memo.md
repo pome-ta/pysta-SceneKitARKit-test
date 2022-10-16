@@ -28,3 +28,14 @@
 /System/Library/PrivateFrameworks/RealityIO.framework
 
 ```
+
+## `debugOptions`
+
+
+```
+>>> int("fffffffffc000000", 16)
+18446744073642442752
+>>> (1 << 1) | (1 << 31)
+2147483650
+
+```
