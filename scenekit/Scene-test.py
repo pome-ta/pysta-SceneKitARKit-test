@@ -30,7 +30,8 @@ class View(ui.View):
   @on_main_thread
   def viewDidLoad(self):
     ship_URL = nsurl('./assets/ship.scn')
-    bkSky_URL = NSData.dataWithContentsOfURL_(nsurl('./assets/Background_sky.png'))
+    bkSky_URL = NSData.dataWithContentsOfURL_(
+      nsurl('./assets/Background_sky.png'))
     tex_bks = UIImage.alloc().initWithData_(bkSky_URL)
     # --- Scene
     scene = SCNScene.sceneWithURL_options_(ship_URL, None)

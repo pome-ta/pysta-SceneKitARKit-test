@@ -68,7 +68,7 @@ class ViewController:
   def __init__(self):
     # create delegate
     methods = [
-      renderer_didAddNode_forAnchor_, #renderer_didUpdateNode_forAnchor_,
+      renderer_didAddNode_forAnchor_,  #renderer_didUpdateNode_forAnchor_,
       #renderer_didRemoveNode_forAnchor_
     ]
     protocols = ['ARSCNViewDelegate']
